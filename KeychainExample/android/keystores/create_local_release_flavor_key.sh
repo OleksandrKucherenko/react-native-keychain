@@ -72,7 +72,7 @@ $JDK/keytool -genkey -alias $ALIAS -keyalg RSA -validity 20000 \
 #    >output.log 2>&1
 echo [3/$STEPS] keystore generated: ./$KEYSTORE
 
-if [[ "debug" != "${flavor}" ]]; then
+if [[ ! -f $PROPS || "debug" != "${flavor}" ]]; then
   # compose properties file with configuration
   echo "# generated at $(date +%Y-%m-%d_%H-%M-%S) / $(date +%s)" >$PROPS
   echo "key.store=${KEYSTORE}" >>$PROPS
