@@ -1,6 +1,7 @@
 package com.oblador.keychain.cipherStorage;
 
 import android.annotation.TargetApi;
+import android.content.Context;
 import android.os.Build;
 import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyInfo;
@@ -45,6 +46,10 @@ public class CipherStorageKeystoreAesCbc extends CipherStorageBase {
 
   public static final String DEFAULT_SERVICE = "RN_KEYCHAIN_DEFAULT_ALIAS";
   //endregion
+
+  public CipherStorageKeystoreAesCbc(@NonNull final Context context) {
+    super(context);
+  }
 
   //region Configuration
   @Override

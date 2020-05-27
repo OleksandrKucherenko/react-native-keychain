@@ -33,6 +33,8 @@ public class CipherStorageFacebookConceal extends CipherStorageBase {
   private final Crypto crypto;
 
   public CipherStorageFacebookConceal(@NonNull final ReactApplicationContext reactContext) {
+    super(reactContext);
+
     KeyChain keyChain = new SharedPrefsBackedKeyChain(reactContext, CryptoConfig.KEY_256);
 
     this.crypto = AndroidConceal.get().createDefaultCrypto(keyChain);

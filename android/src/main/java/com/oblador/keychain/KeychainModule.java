@@ -133,11 +133,11 @@ public class KeychainModule extends ReactContextBaseJavaModule {
     prefsStorage = new PrefsStorage(reactContext);
 
     addCipherStorageToMap(new CipherStorageFacebookConceal(reactContext));
-    addCipherStorageToMap(new CipherStorageKeystoreAesCbc());
+    addCipherStorageToMap(new CipherStorageKeystoreAesCbc(reactContext));
 
     // we have a references to newer api that will fail load of app classes in old androids OS
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-      addCipherStorageToMap(new CipherStorageKeystoreRsaEcb());
+      addCipherStorageToMap(new CipherStorageKeystoreRsaEcb(reactContext));
     }
   }
 
