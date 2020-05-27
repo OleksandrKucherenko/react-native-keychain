@@ -34,6 +34,8 @@ import com.oblador.keychain.exceptions.CryptoFailedException;
 import com.oblador.keychain.exceptions.EmptyParameterException;
 import com.oblador.keychain.exceptions.KeyStoreAccessException;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Executor;
@@ -58,6 +60,7 @@ public class KeychainModule extends ReactContextBaseJavaModule {
     , AccessControl.APPLICATION_PASSWORD
     , AccessControl.BIOMETRY_ANY_OR_DEVICE_PASSCODE
     , AccessControl.BIOMETRY_CURRENT_SET_OR_DEVICE_PASSCODE})
+  @Retention(RetentionPolicy.SOURCE)
   @interface AccessControl {
     String USER_PRESENCE = "UserPresence";
     String BIOMETRY_ANY = "BiometryAny";
@@ -96,6 +99,7 @@ public class KeychainModule extends ReactContextBaseJavaModule {
 
   /** Supported ciphers. */
   @StringDef({KnownCiphers.FB, KnownCiphers.AES, KnownCiphers.RSA})
+  @Retention(RetentionPolicy.SOURCE)
   public @interface KnownCiphers {
     /** Facebook conceal compatibility lib in use. */
     String FB = "FacebookConceal";
@@ -107,6 +111,7 @@ public class KeychainModule extends ReactContextBaseJavaModule {
 
   /** Secret manipulation rules. */
   @StringDef({Rules.AUTOMATIC_UPGRADE, Rules.NONE})
+  @Retention(RetentionPolicy.SOURCE)
   @interface Rules {
     String NONE = "none";
     String AUTOMATIC_UPGRADE = "automaticUpgradeToMoreSecuredStorage";
