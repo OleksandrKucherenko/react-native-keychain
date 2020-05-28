@@ -44,60 +44,34 @@ import static com.oblador.keychain.SecurityLevel.SECURE_HARDWARE;
 @SuppressWarnings({"unused", "WeakerAccess", "CharsetObjectCanBeUsed", "UnusedReturnValue"})
 abstract public class CipherStorageBase implements CipherStorage {
   //region Constants
-  /**
-   * Logging tag.
-   */
+  /** Logging tag. */
   protected static final String LOG_TAG = CipherStorageBase.class.getSimpleName();
-  /**
-   * Default key storage type/name.
-   */
+  /** Default key storage type/name. */
   public static final String KEYSTORE_TYPE = "AndroidKeyStore";
-  /**
-   * Key used for testing storage capabilities.
-   */
+  /** Key used for testing storage capabilities. */
   public static final String TEST_KEY_ALIAS = KEYSTORE_TYPE + "#supportsSecureHardware";
-  /**
-   * Size of hash calculation buffer. Default: 4Kb.
-   */
+  /** Size of hash calculation buffer. Default: 4Kb. */
   private static final int BUFFER_SIZE = 4 * 1024;
-  /**
-   * Default size of read/write operation buffer. Default: 16Kb.
-   */
+  /** Default size of read/write operation buffer. Default: 16Kb. */
   private static final int BUFFER_READ_WRITE_SIZE = 4 * BUFFER_SIZE;
-  /**
-   * Default charset encoding.
-   */
+  /** Default charset encoding. */
   public static final Charset UTF8 = Charset.forName("UTF-8");
   //endregion
 
   //region Members
-  /**
-   * Guard object for {@link #isSupportsSecureHardware} field.
-   */
+  /** Guard object for {@link #isSupportsSecureHardware} field. */
   protected final Object _sync = new Object();
-  /**
-   * Try to resolve it only once and cache result for all future calls.
-   */
+  /** Try to resolve it only once and cache result for all future calls. */
   protected transient AtomicBoolean isSupportsSecureHardware;
-  /**
-   * Guard for {@link #isStrongboxAvailable} field assignment.
-   */
+  /** Guard for {@link #isStrongboxAvailable} field assignment. */
   protected final Object _syncStrongbox = new Object();
-  /**
-   * Try to resolve support of the strongbox and cache result for future calls.
-   */
+  /** Try to resolve support of the strongbox and cache result for future calls. */
   protected transient AtomicBoolean isStrongboxAvailable;
-  /**
-   * Get cached instance of cipher. Get instance operation is slow.
-   */
+  /** Get cached instance of cipher. Get instance operation is slow. */
   protected transient Cipher cachedCipher;
-  /**
-   * Cached instance of the Keystore.
-   */
+  /** Cached instance of the Keystore. */
   protected transient KeyStore cachedKeyStore;
-  /**
-   * Reference to the application context.
-   */
+  /** Reference to the application context. */
   protected final Context applicationContext;
   //endregion
 
@@ -107,9 +81,7 @@ abstract public class CipherStorageBase implements CipherStorage {
 
   //region Overrides
 
-  /**
-   * Hardware supports keystore operations.
-   */
+  /** Hardware supports keystore operations. */
   @Override
   public SecurityLevel securityLevel() {
     return SecurityLevel.SECURE_HARDWARE;
@@ -130,9 +102,7 @@ abstract public class CipherStorageBase implements CipherStorage {
         (getMinSupportedApiLevel()); // 19..29
   }
 
-  /**
-   * Try device capabilities by creating temporary key in keystore.
-   */
+  /** Try device capabilities by creating temporary key in keystore. */
   @Override
   public boolean supportsSecureHardware() {
     if (null != isSupportsSecureHardware) return isSupportsSecureHardware.get();
@@ -161,17 +131,13 @@ abstract public class CipherStorageBase implements CipherStorage {
     return isSupportsSecureHardware.get();
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  /** {@inheritDoc} */
   @Override
   public String getDefaultAliasServiceName() {
     return getCipherStorageName();
   }
 
-  /**
-   * Remove key with provided name from security storage.
-   */
+  /** Remove key with provided name from security storage. */
   @Override
   public void removeKey(@NonNull final String alias) throws KeyStoreAccessException {
     final String safeAlias = getDefaultAliasIfEmpty(alias, getDefaultAliasServiceName());
@@ -190,44 +156,32 @@ abstract public class CipherStorageBase implements CipherStorage {
 
   //region Abstract methods
 
-  /**
-   * Get encryption algorithm specification builder instance.
-   */
+  /** Get encryption algorithm specification builder instance. */
   @NonNull
   protected abstract KeyGenParameterSpec.Builder getKeyGenSpecBuilder(@NonNull final String alias)
     throws GeneralSecurityException;
 
-  /**
-   * Get information about provided key.
-   */
+  /** Get information about provided key. */
   @NonNull
   protected abstract KeyInfo getKeyInfo(@NonNull final Key key) throws GeneralSecurityException;
 
-  /**
-   * Try to generate key from provided specification.
-   */
+  /** Try to generate key from provided specification. */
   @NonNull
   protected abstract Key generateKey(@NonNull final KeyGenParameterSpec spec)
     throws GeneralSecurityException;
 
-  /**
-   * Get name of the required encryption algorithm.
-   */
+  /** Get name of the required encryption algorithm. */
   @NonNull
   protected abstract String getEncryptionAlgorithm();
 
-  /**
-   * Get transformation algorithm for encrypt/decrypt operations.
-   */
+  /** Get transformation algorithm for encrypt/decrypt operations. */
   @NonNull
   protected abstract String getEncryptionTransformation();
   //endregion
 
   //region Implementation
 
-  /**
-   * Get cipher instance and cache it for any next call.
-   */
+  /** Get cipher instance and cache it for any next call. */
   @NonNull
   public Cipher getCachedInstance() throws NoSuchAlgorithmException, NoSuchPaddingException {
     if (null == cachedCipher) {
@@ -241,9 +195,7 @@ abstract public class CipherStorageBase implements CipherStorage {
     return cachedCipher;
   }
 
-  /**
-   * Check requirements to the security level.
-   */
+  /** Check requirements to the security level. */
   protected void throwIfInsufficientLevel(@NonNull final SecurityLevel level)
     throws CryptoFailedException {
 
@@ -254,9 +206,7 @@ abstract public class CipherStorageBase implements CipherStorage {
     }
   }
 
-  /**
-   * Extract existing key or generate a new one. In case of problems raise exception.
-   */
+  /** Extract existing key or generate a new one. In case of problems raise exception. */
   @NonNull
   protected Key extractGeneratedKey(@NonNull final String safeAlias,
                                     @NonNull final SecurityLevel level,
@@ -279,9 +229,7 @@ abstract public class CipherStorageBase implements CipherStorage {
     return key;
   }
 
-  /**
-   * Try to extract key by alias from keystore, in case of 'known android bug' reduce retry counter.
-   */
+  /** Try to extract key by alias from keystore, in case of 'known android bug' reduce retry counter. */
   @Nullable
   protected Key extractKey(@NonNull final KeyStore keyStore,
                            @NonNull final String safeAlias,
@@ -312,9 +260,7 @@ abstract public class CipherStorageBase implements CipherStorage {
     return key;
   }
 
-  /**
-   * Verify that provided key satisfy minimal needed level.
-   */
+  /** Verify that provided key satisfy minimal needed level. */
   protected boolean validateKeySecurityLevel(@NonNull final SecurityLevel level,
                                              @NonNull final Key key)
     throws GeneralSecurityException {
@@ -323,9 +269,7 @@ abstract public class CipherStorageBase implements CipherStorage {
       .satisfiesSafetyThreshold(level);
   }
 
-  /**
-   * Get the supported level of security for provided Key instance.
-   */
+  /** Get the supported level of security for provided Key instance. */
   @NonNull
   protected SecurityLevel getSecurityLevel(@NonNull final Key key) throws GeneralSecurityException {
     final KeyInfo keyInfo = getKeyInfo(key);
@@ -342,9 +286,7 @@ abstract public class CipherStorageBase implements CipherStorage {
     return SecurityLevel.SECURE_SOFTWARE;
   }
 
-  /**
-   * Load key store.
-   */
+  /** Load key store. */
   @NonNull
   public KeyStore getKeyStoreAndLoad() throws KeyStoreAccessException {
     if (null == cachedKeyStore) {
@@ -366,9 +308,7 @@ abstract public class CipherStorageBase implements CipherStorage {
     return cachedKeyStore;
   }
 
-  /**
-   * Default encryption with cipher without initialization vector.
-   */
+  /** Default encryption with cipher without initialization vector. */
   @NonNull
   public byte[] encryptString(@NonNull final Key key, @NonNull final String value)
     throws IOException, GeneralSecurityException {
@@ -376,9 +316,7 @@ abstract public class CipherStorageBase implements CipherStorage {
     return encryptString(key, value, Defaults.encrypt);
   }
 
-  /**
-   * Default decryption with cipher without initialization vector.
-   */
+  /** Default decryption with cipher without initialization vector. */
   @NonNull
   public String decryptBytes(@NonNull final Key key, @NonNull final byte[] bytes)
     throws IOException, GeneralSecurityException {
@@ -386,9 +324,7 @@ abstract public class CipherStorageBase implements CipherStorage {
     return decryptBytes(key, bytes, Defaults.decrypt);
   }
 
-  /**
-   * Encrypt provided string value.
-   */
+  /** Encrypt provided string value. */
   @NonNull
   protected byte[] encryptString(@NonNull final Key key, @NonNull final String value,
                                  @Nullable final EncryptStringHandler handler)
@@ -417,9 +353,7 @@ abstract public class CipherStorageBase implements CipherStorage {
     }
   }
 
-  /**
-   * Decrypt provided bytes to a string.
-   */
+  /** Decrypt provided bytes to a string. */
   @NonNull
   protected String decryptBytes(@NonNull final Key key, @NonNull final byte[] bytes,
                                 @Nullable final DecryptBytesHandler handler)
@@ -447,9 +381,7 @@ abstract public class CipherStorageBase implements CipherStorage {
     }
   }
 
-  /**
-   * Get the most secured keystore
-   */
+  /** Get the most secured keystore */
   public void generateKeyAndStoreUnderAlias(@NonNull final String alias,
                                             @NonNull final SecurityLevel requiredLevel)
     throws GeneralSecurityException {
@@ -490,9 +422,7 @@ abstract public class CipherStorageBase implements CipherStorage {
     }
   }
 
-  /**
-   * Try to get secured keystore instance.
-   */
+  /** Try to get secured keystore instance. */
   @NonNull
   protected Key tryGenerateRegularSecurityKey(@NonNull final String alias)
     throws GeneralSecurityException {
@@ -507,9 +437,7 @@ abstract public class CipherStorageBase implements CipherStorage {
     return generateKey(specification);
   }
 
-  /**
-   * Try to check hardware feature flag.
-   */
+  /** Try to check hardware feature flag. */
   @RequiresApi(api = Build.VERSION_CODES.P)
   private boolean hasStrongboxFeature() {
     final PackageManager pm = applicationContext
@@ -519,9 +447,7 @@ abstract public class CipherStorageBase implements CipherStorage {
     return pm.hasSystemFeature(PackageManager.FEATURE_STRONGBOX_KEYSTORE);
   }
 
-  /**
-   * Try to get strong secured keystore instance. (StrongBox security chip)
-   */
+  /** Try to get strong secured keystore instance. (StrongBox security chip) */
   @NonNull
   protected Key tryGenerateStrongBoxSecurityKey(@NonNull final String alias)
     throws GeneralSecurityException {
@@ -545,18 +471,14 @@ abstract public class CipherStorageBase implements CipherStorage {
 
   //region Testing
 
-  /**
-   * Override internal cipher instance cache.
-   */
+  /** Override internal cipher instance cache. */
   @VisibleForTesting
   public CipherStorageBase setCipher(final Cipher cipher) {
     cachedCipher = cipher;
     return this;
   }
 
-  /**
-   * Override the keystore instance cache.
-   */
+  /** Override the keystore instance cache. */
   @VisibleForTesting
   public CipherStorageBase setKeyStore(final KeyStore keystore) {
     cachedKeyStore = keystore;
@@ -566,9 +488,7 @@ abstract public class CipherStorageBase implements CipherStorage {
 
   //region Static methods
 
-  /**
-   * Convert provided service name to safe not-null/not-empty value.
-   */
+  /** Convert provided service name to safe not-null/not-empty value. */
   @NonNull
   public static String getDefaultAliasIfEmpty(@Nullable final String service, @NonNull final String fallback) {
     //noinspection ConstantConditions
@@ -595,9 +515,7 @@ abstract public class CipherStorageBase implements CipherStorage {
 
   //region Nested declarations
 
-  /**
-   * Generic cipher initialization.
-   */
+  /** Generic cipher initialization. */
   public static final class Defaults {
     public static final EncryptStringHandler encrypt = (cipher, key, output) -> {
       cipher.init(Cipher.ENCRYPT_MODE, key);
@@ -608,35 +526,25 @@ abstract public class CipherStorageBase implements CipherStorage {
     };
   }
 
-  /**
-   * Initialization vector support.
-   */
+  /** Initialization vector support. */
   public static final class IV {
-    /**
-     * Encryption/Decryption initialization vector length.
-     */
+    /** Encryption/Decryption initialization vector length. */
     public static final int IV_LENGTH = 16;
 
-    /**
-     * Save Initialization vector to output stream.
-     */
+    /** Save Initialization vector to output stream. */
     public static final EncryptStringHandler encrypt = (cipher, key, output) -> {
       cipher.init(Cipher.ENCRYPT_MODE, key);
 
       final byte[] iv = cipher.getIV();
       output.write(iv, 0, iv.length);
     };
-    /**
-     * Read initialization vector from input stream and configure cipher by it.
-     */
+    /** Read initialization vector from input stream and configure cipher by it. */
     public static final DecryptBytesHandler decrypt = (cipher, key, input) -> {
       final IvParameterSpec iv = readIv(input);
       cipher.init(Cipher.DECRYPT_MODE, key, iv);
     };
 
-    /**
-     * Extract initialization vector from provided bytes array.
-     */
+    /** Extract initialization vector from provided bytes array. */
     @NonNull
     public static IvParameterSpec readIv(@NonNull final byte[] bytes) throws IOException {
       final byte[] iv = new byte[IV_LENGTH];
@@ -649,9 +557,7 @@ abstract public class CipherStorageBase implements CipherStorage {
       return new IvParameterSpec(iv);
     }
 
-    /**
-     * Extract initialization vector from provided input stream.
-     */
+    /** Extract initialization vector from provided input stream. */
     @NonNull
     public static IvParameterSpec readIv(@NonNull final InputStream inputStream) throws IOException {
       final byte[] iv = new byte[IV_LENGTH];
@@ -664,25 +570,19 @@ abstract public class CipherStorageBase implements CipherStorage {
     }
   }
 
-  /**
-   * Handler for storing cipher configuration in output stream.
-   */
+  /** Handler for storing cipher configuration in output stream. */
   public interface EncryptStringHandler {
     void initialize(@NonNull final Cipher cipher, @NonNull final Key key, @NonNull final OutputStream output)
       throws GeneralSecurityException, IOException;
   }
 
-  /**
-   * Handler for configuring cipher by initialization data from input stream.
-   */
+  /** Handler for configuring cipher by initialization data from input stream. */
   public interface DecryptBytesHandler {
     void initialize(@NonNull final Cipher cipher, @NonNull final Key key, @NonNull final InputStream input)
       throws GeneralSecurityException, IOException;
   }
 
-  /**
-   * Auto remove keystore key.
-   */
+  /** Auto remove keystore key. */
   public class SelfDestroyKey implements Closeable {
     public final String name;
     public final Key key;

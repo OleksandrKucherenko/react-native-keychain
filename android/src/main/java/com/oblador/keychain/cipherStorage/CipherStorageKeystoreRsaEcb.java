@@ -35,33 +35,21 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.crypto.NoSuchPaddingException;
 
-/**
- * Fingerprint biometry protected storage.
- */
+/** Fingerprint biometry protected storage. */
 @RequiresApi(api = Build.VERSION_CODES.M)
 @SuppressWarnings({"unused", "WeakerAccess"})
 public class CipherStorageKeystoreRsaEcb extends CipherStorageBase {
   //region Constants
-  /**
-   * Selected algorithm.
-   */
+  /** Selected algorithm. */
   public static final String ALGORITHM_RSA = KeyProperties.KEY_ALGORITHM_RSA;
-  /**
-   * Selected block mode.
-   */
+  /** Selected block mode. */
   public static final String BLOCK_MODE_ECB = KeyProperties.BLOCK_MODE_ECB;
-  /**
-   * Selected padding transformation.
-   */
+  /** Selected padding transformation. */
   public static final String PADDING_PKCS1 = KeyProperties.ENCRYPTION_PADDING_RSA_PKCS1;
-  /**
-   * Composed transformation algorithms.
-   */
+  /** Composed transformation algorithms. */
   public static final String TRANSFORMATION_RSA_ECB_PKCS1 =
     ALGORITHM_RSA + "/" + BLOCK_MODE_ECB + "/" + PADDING_PKCS1;
-  /**
-   * Selected encryption key size.
-   */
+  /** Selected encryption key size. */
   public static final int ENCRYPTION_KEY_SIZE = 3072;
   //endregion
 
@@ -149,8 +137,7 @@ public class CipherStorageKeystoreRsaEcb extends CipherStorageBase {
       Log.d(LOG_TAG, "Unlock of keystore is needed. Error: " + ex.getMessage(), ex);
 
       // expected that KEY instance is extracted and we caught exception on decryptBytes operation
-      @SuppressWarnings("ConstantConditions") final DecryptionContext context =
-        new DecryptionContext(safeAlias, key, password, username);
+      final DecryptionContext context = new DecryptionContext(safeAlias, key, password, username);
 
       handler.askAccessPermissions(context);
     } catch (final Throwable fail) {
@@ -163,42 +150,32 @@ public class CipherStorageKeystoreRsaEcb extends CipherStorageBase {
 
   //region Configuration
 
-  /**
-   * RSAECB.
-   */
+  /** RSAECB. */
   @Override
   public String getCipherStorageName() {
     return KeychainModule.KnownCiphers.RSA;
   }
 
-  /**
-   * API23 is a requirement.
-   */
+  /** API23 is a requirement. */
   @Override
   public int getMinSupportedApiLevel() {
     return Build.VERSION_CODES.M;
   }
 
-  /**
-   * Biometry is supported.
-   */
+  /** Biometry is supported. */
   @Override
   public boolean isBiometrySupported() {
     return true;
   }
 
-  /**
-   * RSA.
-   */
+  /** RSA. */
   @NonNull
   @Override
   protected String getEncryptionAlgorithm() {
     return ALGORITHM_RSA;
   }
 
-  /**
-   * RSA/ECB/PKCS1Padding
-   */
+  /** RSA/ECB/PKCS1Padding */
   @NonNull
   @Override
   protected String getEncryptionTransformation() {
@@ -208,9 +185,7 @@ public class CipherStorageKeystoreRsaEcb extends CipherStorageBase {
 
   //region Implementation
 
-  /**
-   * Clean code without try/catch's that encrypt username and password with a key specified by alias.
-   */
+  /** Clean code without try/catch's that encrypt username and password with a key specified by alias. */
   @NonNull
   private EncryptionResult innerEncryptedCredentials(@NonNull final String alias,
                                                      @NonNull final String password,
@@ -237,9 +212,7 @@ public class CipherStorageKeystoreRsaEcb extends CipherStorageBase {
       this);
   }
 
-  /**
-   * Get builder for encryption and decryption operations with required user Authentication.
-   */
+  /** Get builder for encryption and decryption operations with required user Authentication. */
   @NonNull
   @Override
   @SuppressLint("NewApi")
@@ -260,9 +233,7 @@ public class CipherStorageKeystoreRsaEcb extends CipherStorageBase {
       .setKeySize(ENCRYPTION_KEY_SIZE);
   }
 
-  /**
-   * Get information about provided key.
-   */
+  /** Get information about provided key. */
   @NonNull
   @Override
   protected KeyInfo getKeyInfo(@NonNull final Key key) throws GeneralSecurityException {
@@ -275,9 +246,7 @@ public class CipherStorageKeystoreRsaEcb extends CipherStorageBase {
     return factory.getKeySpec(key, KeyInfo.class);
   }
 
-  /**
-   * Try to generate key from provided specification.
-   */
+  /** Try to generate key from provided specification. */
   @NonNull
   @Override
   protected Key generateKey(@NonNull final KeyGenParameterSpec spec) throws GeneralSecurityException {
@@ -295,9 +264,7 @@ public class CipherStorageKeystoreRsaEcb extends CipherStorageBase {
 
   //region Nested classes
 
-  /**
-   * Non interactive handler for decrypting the credentials.
-   */
+  /** Non interactive handler for decrypting the credentials. */
   public static class NonInteractiveHandler implements DecryptionResultHandler {
     private DecryptionResult result;
     private Throwable error;
